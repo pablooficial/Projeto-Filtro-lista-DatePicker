@@ -1,0 +1,78 @@
+body {
+    font-family: sans-serif;
+    background-color: #dedede;
+    color: #333;
+    padding: 20px 0 28px 0;
+    margin: 0;
+  }
+  
+  img {
+  display: flex;
+  max-width: 250px;
+  float: left;
+   margin: 20px;
+   border-radius: 10px;
+  }
+  
+.ui-datepicker-title{
+  padding: 4px;
+  text-align: center;
+}
+
+  .events-name {
+    font-size: 20rem;
+    font-weight: normal;
+    margin: 0 0 1rem 0;
+  }
+  
+  .events-link {
+    font-size: 0.9rem;
+    color: #564750;
+    vertical-align: middle;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  .foods-list > span {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 17px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+p{
+  display: flex;
+  overflow: auto;
+}
+  .ui-listview > li p{
+    max-width: 600px;
+    font-size: 0.85em !important;
+    font-size: .75em;
+    font-weight: normal;
+    display: block;
+    margin: .6em 0;
+    text-overflow: unset;
+    overflow: auto!important;;
+    white-space: break-spaces!important;;
+  }
+  .footer {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    margin: 0;
+    box-shadow: none;
+  }
+
+#ui-listview{
+  font-size: 2em;
+  color: #f4791c;
+  font-weight: normal;
+}
+.ui-content{
+  box-shadow: 0px 3px 0px darkorange}
+ 
+.ui-content:hover
+{top:-4px;box-shadow:0 4px 4px #999;
+  transition: all .2s ease-in-out}
+

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <script type="text/javascript" src="dados.json"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.css" />
+  <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <title>Sistema de Eventos</title>
+  <script>
+    $(function () {
+      $("#datepicker").datepicker();
+    });
+    var dateFilter = "", dateFilterPlaceholder = "Escolha uma data";
+    function clearDateFilter() {
+      dateFilter = "";
+      $("#dp-button").text(dateFilterPlaceholder);
+      $("#mylist").filterable("refresh");
+    }
+    function matchOrDate(idx, searchValue) {
+      var ret = false;
+      if (dateFilter !== "") {
+        var filtdate = $(this).data("datefilter") || "";
+        if ((filtdate != dateFilter)) {
+          ret = true; //filtrar 
+        }
+      }
+      if (searchValue && searchValue.length > 0) {
+        searchValue = searchValue.toLowerCase();
+        var filttext = $(this).data("filtertext").toLowerCase() || "";
+        if (filttext.indexOf(searchValue) < 0) {
+          ret = true; //filtrar 
+        }
+      }
+      return ret;
+    }
+    $(document).on("pagecreate", "#page-one", function () {
+      $("#datepicker").datepicker({
+        onSelect: function (dateText) {
+          var date = $(this).datepicker("getDate");
+          var d = date.getDate(), m = date.getMonth() + 1, y = date.getFullYear();
+          dateFilter = "" + y + "-" + (m > 9 ? m : "0" + m) + "-" + (d > 9 ? d : "0" + d);
+          $("#dp-popup").popup("close");
+          $("#dp-button").text(dateText);
+          $("#mylist").filterable("refresh");
+        }
+      });
+      $("#mylist").filterable("option", "filterCallback", matchOrDate);
+    });
+    (function () {
+      // / usando um ícone do jQuery Mobile no botão de disparo
+      $.datepicker._triggerClass += "ui-btn ui-btn-right ui-icon-carat-d ui-btn-icon-notext ui-corner-all";
+      // substituir as classes CSS da UI do jQuery pelas classes CSS do jQuery Mobile no HTML gerado
+      $.datepicker._generateHTML_old = $.datepicker._generateHTML;
+      $.datepicker._generateHTML = function (inst) {
+        return $("<div></div>").html(this._generateHTML_old(inst))
+          .find(".ui-datepicker-header").removeClass("ui-widget-header ui-helper-clearfix").addClass("ui-bar-inherit").end()
+          .find(".ui-datepicker-prev").addClass("ui-btn ui-btn-left ui-icon-carat-l ui-btn-icon-notext").end()
+          .find(".ui-datepicker-next").addClass("ui-btn ui-btn-right ui-icon-carat-r ui-btn-icon-notext").end()
+          .find(".ui-icon.ui-icon-circle-triangle-e, .ui-icon.ui-icon-circle-triangle-w").replaceWith(function () {
+            return this.childNodes;
+          }).end()
+          .find("span.ui-state-default").removeClass("ui-state-default").addClass("ui-btn").end()
+          .find("a.ui-state-default.ui-state-active").removeClass("ui-state-default ui-state-highlight ui-priority-secondary ui-state-active").addClass("ui-btn ui-btn-active").end()
+          .find("a.ui-state-default").removeClass("ui-state-default ui-state-highlight ui-priority-secondary").addClass("ui-btn").end()
+          .find(".ui-datepicker-buttonpane").removeClass("ui-widget-content").end()
+          .find(".ui-datepicker-current").removeClass("ui-state-default ui-priority-secondary").addClass("ui-btn ui-btn-inline ui-mini").end()
+          .find(".ui-datepicker-close").removeClass("ui-state-default ui-priority-primary").addClass("ui-btn ui-btn-inline ui-mini").end()
+          .html();
+      };
+      // substitui as classes CSS da UI do jQuery pelas classes CSS do jQuery Mobile na div datepicker, desvincule os eventos de mouseover e mouseout na div datepicker
+      $.datepicker._newInst_old = $.datepicker._newInst;
+      $.datepicker._newInst = function (target, inline) {
+        var inst = this._newInst_old(target, inline);
+        if (inst.dpDiv.hasClass("ui-widget")) {
+          inst.dpDiv.removeClass("ui-widget ui-widget-content ui-helper-clearfix").addClass(inline ? "ui-content" : "ui-content ui-overlay-shadow ui-body-a").unbind("mouseover mouseout");
+        }
+        return inst;
+      };
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+    function formatDate(date) {
+      var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+      if (month.length < 2)
+        month = '0' + month;
+      if (day.length < 2)
+        day = '0' + day;
+      return [year, month, day].join('-');
+    }
+    function listagem(events) {
+      return `
+      <div id="page-one" data-role="page">
+        <div data-role="header" data-position="fixed">
+          <h1>Filtrar Eventos</h1>
+        </div>
+        <div role="main" class="ui-content">
+          <div class="ui-grid-a">
+            <div class="ui-block-a"><a id="dp-button" href="#dp-popup" data-rel="popup" data-position-to="window"
+              class="ui-btn ui-corner-all ui-icon-calendar ui-btn-icon-left ui-mini"
+              data-transition="pop">Escolha a data</a></div>
+            <div class="ui-block-b"><a id="clear-date-button" href="#"
+              class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left ui-mini"
+              onclick="clearDateFilter(); return false" rel="external">Limpar filtro de data</a></div>
+          </div>
+          <ul data-role="listview" data-inset="true" data-filter="true" id="mylist" name="mylist">
+            ${events.map(getItem).join("")}
+          </ul>
+        </div>
+        <div data-role="popup" id="dp-popup" data-theme="a" class="ui-corner-all">
+          <div id="datepicker"></div>
+        </div>
+        <p class="footer">Temos cadastrados 
+    ${events.length} eventos. Fique sempre por dentro das novidades através de nosso site.</p>
+      </div>
+      `
+    }
+    function getItem(event) {
+      var date = formatDate(new Date(event.start));
+      return `
+      <li data-filtertext="${event.title}  ${event.category}" data-datefilter="${date}">
+          <a href="${event.link}" data-ajax="false">
+            <div class="ui-content">
+              <div class="ui-block-a"> 
+                <img src="${event.image}" class="Responsive image" >
+              </div>
+             <div class="ui-block-b"> 
+              <h2 id="ui-listview"> ${event.title} </h2>
+              <span class="events-link">(${event.link})</span></h2>
+              <p><strong>Categoria: ${event.category}</strong></p>
+              <p><strong>Preço: </strong>${event.costs}</p>   
+              <p><strong>Recorrência: </strong> ${event.recurrence}</p>                    
+              <p class="card-text">${event.description} </p>
+              <small class="foods-list">${event.venue.name}, </small>
+              <small class="foods-list">${event.venue.zip}, </small>
+              <small class="foods-list">${event.venue.city}- </small>
+              <small class="foods-list">${event.venue.street} </small>
+              <p class="ui-li-aside">
+                <strong>Data: ${date} </strong>
+              </p>                
+            </div>
+            </div>
+          </a>
+      </li>
+    `
+    }
+    document.getElementById("app").innerHTML = `${listagem(events)} `; 
+  </script>
+</body>
+
+</html>
